@@ -1,5 +1,8 @@
 package brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas
 
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +26,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,13 +36,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DaftarKelasScreen(
     navController: NavController
 ) {
+    var progress by remember { mutableFloatStateOf(1/5f) }
+    var selectedProgram by remember { mutableStateOf<String?>(null) }
 
-    var progress by remember { mutableFloatStateOf(2/5f) }
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
+        label = "progress_animation"
+    )
 
     Scaffold(
         topBar = {
@@ -50,7 +61,12 @@ fun DaftarKelasScreen(
                 CenterAlignedTopAppBar(
                     navigationIcon = {
                         IconButton(
-                            onClick = { },
+                            onClick = {
+                                if (progress > 1/5f) {
+                                    progress = 1/5f
+                                    selectedProgram = null
+                                }
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
                                 contentColor = Color.White
                             ),
@@ -93,7 +109,7 @@ fun DaftarKelasScreen(
                     .background(Color(0xFF031A2F))
             ) {
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = { animatedProgress },
                     color = Color(0xFFFFB61A),
                     trackColor = Color.Transparent,
                     modifier = Modifier.fillMaxSize().padding(2.dp),
@@ -101,11 +117,19 @@ fun DaftarKelasScreen(
             }
 
             if (progress == 1/5f) {
-                PilihProgramBelajarScreen()
+                PilihProgramBelajarScreen(
+                    onProgramSelected = { programTitle ->
+                        println("DEBUG: Program selected - $programTitle")
+                        selectedProgram = programTitle
+                        progress = 2/5f
+                        println("DEBUG: Progress updated to $progress")
+                    }
+                )
             } else if (progress == 2/5f) {
-
-            } else if (progress == 3/5f) {
-
+                PilihPaketBelajarScreen(
+                    modifier = Modifier.align(Alignment.Start),
+//                    selectedProgram = selectedProgram ?: ""
+                )
             }
         }
     }

@@ -1,12 +1,14 @@
 package brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,8 +35,9 @@ import brawijaya.example.tuteedaftarkelas.R
 import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.ProgramBelajarCard
 
 @Composable
-fun PilihProgramBelajarScreen() {
-
+fun PilihProgramBelajarScreen(
+    onProgramSelected: (String) -> Unit = {}
+) {
     val imageList = listOf(
         R.drawable.bg_card_1,
         R.drawable.bg_card_3,
@@ -45,7 +49,30 @@ fun PilihProgramBelajarScreen() {
         R.drawable.bg_card_8,
     )
 
+    val programTitles = listOf(
+        "Pemrograman Dasar Java",
+        "Project Management",
+        "Data Mining",
+        "Pemrograman Android",
+        "Pemrograman Android",
+        "Data Science",
+        "Pemrograman Web",
+        "Project Management"
+    )
+
     var searchBar by remember { mutableStateOf("") }
+
+    val allPrograms = programTitles.mapIndexed { index, title ->
+        Pair(imageList[index], title)
+    }
+
+    val filteredPrograms = if (searchBar.isEmpty()) {
+        allPrograms
+    } else {
+        allPrograms.filter { (_, title) ->
+            title.contains(searchBar, ignoreCase = true)
+        }
+    }
 
     TextField(
         value = searchBar,
@@ -70,7 +97,7 @@ fun PilihProgramBelajarScreen() {
             unfocusedPlaceholderColor = Color(0xFF031A2F),
             focusedContainerColor = Color(0xFFCBD5E1),
             focusedPlaceholderColor = Color(0xFF031A2F),
-            unfocusedTextColor = Color(0xFFCBD5E1),
+            unfocusedTextColor = Color(0xFF031A2F),
             focusedTextColor = Color(0xFF031A2F),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
@@ -93,64 +120,38 @@ fun PilihProgramBelajarScreen() {
         )
     )
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize().padding(bottom = 24.dp)
-    ) {
-        Column(
+    if (filteredPrograms.isEmpty()) {
+        Box(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .fillMaxSize()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
         ) {
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[0],
-                title = "Pemrograman Dasar Java"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[1],
-                title = "Project Management"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[2],
-                title = "Data Mining"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[3],
-                title = "Pemrograman Android"
+            Text(
+                text = "Tidak ada program yang cocok dengan pencarian \"$searchBar\"",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
             )
         }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize().padding(bottom = 24.dp)
         ) {
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[4],
-                title = "Pemrograman Android"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[5],
-                title = "Data Science"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[6],
-                title = "Pemrograman Web"
-            )
-            ProgramBelajarCard(
-                modifier = Modifier.weight(1f),
-                imageRes = imageList[7],
-                title = "Project Management"
-            )
+            items(filteredPrograms) { (imageRes, title) ->
+                ProgramBelajarCard(
+                    modifier = Modifier.height(120.dp),
+                    imageRes = imageRes,
+                    title = title,
+                    onClick = {
+                        println("DEBUG: Card clicked - $title")
+                        onProgramSelected(title)
+                    }
+                )
+            }
         }
     }
 }
