@@ -2,6 +2,7 @@ package brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +37,8 @@ import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.Prog
 
 @Composable
 fun PilihProgramBelajarScreen(
-    onProgramSelected: (String) -> Unit = {}
+    selectedProgram: String? = null,
+    onSelectionChanged: (String?) -> Unit = {}
 ) {
     val imageList = listOf(
         R.drawable.bg_card_1,
@@ -51,9 +53,9 @@ fun PilihProgramBelajarScreen(
 
     val programTitles = listOf(
         "Pemrograman Dasar Java",
-        "Project Management",
+        "Quality Assurance",
         "Data Mining",
-        "Pemrograman Android",
+        "Pemrograman Swift",
         "Pemrograman Android",
         "Data Science",
         "Pemrograman Web",
@@ -74,83 +76,91 @@ fun PilihProgramBelajarScreen(
         }
     }
 
-    TextField(
-        value = searchBar,
-        onValueChange = { searchBar = it },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        singleLine = true,
-        placeholder = {
-            Text(
-                text = "Cari program belajar yang kamu mau!",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp
+    Column {
+        TextField(
+            value = searchBar,
+            onValueChange = { searchBar = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            singleLine = true,
+            placeholder = {
+                Text(
+                    text = "Cari program belajar yang kamu mau!",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp
+                    )
                 )
+            },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFCBD5E1),
+                unfocusedPlaceholderColor = Color(0xFF031A2F),
+                focusedContainerColor = Color(0xFFCBD5E1),
+                focusedPlaceholderColor = Color(0xFF031A2F),
+                unfocusedTextColor = Color(0xFF031A2F),
+                focusedTextColor = Color(0xFF031A2F),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(10.dp),
+            trailingIcon = {
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Search,
+                        contentDescription = "Search",
+                        tint = Color(0xFF031A2F)
+                    )
+                }
+            },
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp
             )
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color(0xFFCBD5E1),
-            unfocusedPlaceholderColor = Color(0xFF031A2F),
-            focusedContainerColor = Color(0xFFCBD5E1),
-            focusedPlaceholderColor = Color(0xFF031A2F),
-            unfocusedTextColor = Color(0xFF031A2F),
-            focusedTextColor = Color(0xFF031A2F),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        shape = RoundedCornerShape(10.dp),
-        trailingIcon = {
-            IconButton(
-                onClick = {}
+        )
+
+        if (filteredPrograms.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = "Search",
-                    tint = Color(0xFF031A2F)
+                Text(
+                    text = "Tidak ada program yang cocok dengan pencarian \"$searchBar\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center
                 )
             }
-        },
-        textStyle = MaterialTheme.typography.bodyMedium.copy(
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp
-        )
-    )
-
-    if (filteredPrograms.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Tidak ada program yang cocok dengan pencarian \"$searchBar\"",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                textAlign = TextAlign.Center
-            )
-        }
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize().padding(bottom = 24.dp)
-        ) {
-            items(filteredPrograms) { (imageRes, title) ->
-                ProgramBelajarCard(
-                    modifier = Modifier.height(120.dp),
-                    imageRes = imageRes,
-                    title = title,
-                    onClick = {
-                        println("DEBUG: Card clicked - $title")
-                        onProgramSelected(title)
-                    }
-                )
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = if (selectedProgram != null) 80.dp else 24.dp)
+            ) {
+                items(filteredPrograms) { (imageRes, title) ->
+                    ProgramBelajarCard(
+                        modifier = Modifier.height(120.dp),
+                        imageRes = imageRes,
+                        title = title,
+                        isSelected = selectedProgram == title,
+                        onSelectionChanged = { isSelected ->
+                            if (isSelected) {
+                                onSelectionChanged(title)
+                            } else {
+                                onSelectionChanged(null)
+                            }
+                        }
+                    )
+                }
             }
         }
     }

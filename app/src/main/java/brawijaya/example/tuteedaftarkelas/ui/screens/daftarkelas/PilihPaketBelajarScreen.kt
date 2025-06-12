@@ -15,12 +15,22 @@ import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.Pake
 import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.buildDescriptionText
 
 @Composable
-fun PilihPaketBelajarScreen(modifier: Modifier) {
+fun PilihPaketBelajarScreen(
+    modifier: Modifier,
+    selectedPackage: String?,
+    onPackageSelectionChanged: (String?) -> Unit
+) {
 
     val imageList = listOf(
         R.drawable.bg_paket_card_1,
         R.drawable.bg_paket_card_2,
         R.drawable.bg_paket_card_3
+    )
+
+    val packages = listOf(
+        "One-Time Study",
+        "Short-term Study",
+        "Long-term Study"
     )
 
     Text(
@@ -35,29 +45,41 @@ fun PilihPaketBelajarScreen(modifier: Modifier) {
 
     PaketBelajarCard(
         imageRes = imageList[0],
-        title = "One-Time Study",
+        title = packages[0],
         description = buildDescriptionText(
             "Pilih jadwalmu untuk 1x pertemuan! Buat belajarmu jadi lebih fokus untuk materi yang kurang kamu kuasai!",
             listOf("1x", "pertemuan!")
-        )
+        ),
+        isSelected = selectedPackage == packages[0],
+        onSelectionChanged = { isSelected ->
+            onPackageSelectionChanged(if (isSelected) packages[0] else null)
+        }
     )
 
     PaketBelajarCard(
         imageRes = imageList[1],
-        title = "Short-term Study",
+        title = packages[1],
         description = buildDescriptionText(
             "Ngerasa kurang? Coba pembelajaran untuk 1 bulan dengan 4x pertemuan!",
             listOf("1", "bulan", "4x", "pertemuan!")
-        )
+        ),
+        isSelected = selectedPackage == packages[1],
+        onSelectionChanged = { isSelected ->
+            onPackageSelectionChanged(if (isSelected) packages[1] else null)
+        }
     )
 
     PaketBelajarCard(
         imageRes = imageList[2],
-        title = "Long-term Study",
+        title = packages[2],
         description = buildDescriptionText(
             "Butuh pemahaman lebih dalam? Kamu harus cobain pembelajaran selama 3 bulan untuk 12x pertemuan!",
             listOf("3", "bulan", "12x", "pertemuan!")
         ),
-        contentAlignment = Alignment.End
+        contentAlignment = Alignment.End,
+        isSelected = selectedPackage == packages[2],
+        onSelectionChanged = { isSelected ->
+            onPackageSelectionChanged(if (isSelected) packages[2] else null)
+        }
     )
 }

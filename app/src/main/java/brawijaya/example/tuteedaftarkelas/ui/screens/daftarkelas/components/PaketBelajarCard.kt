@@ -1,6 +1,9 @@
 package brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,9 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,13 +42,20 @@ fun PaketBelajarCard(
     imageRes: Int,
     title: String,
     description: AnnotatedString,
-    contentAlignment: Alignment.Horizontal = Alignment.Start
+    contentAlignment: Alignment.Horizontal = Alignment.Start,
+    isSelected: Boolean = false,
+    onSelectionChanged: (Boolean) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(108.dp)
             .clip(RoundedCornerShape(10.dp))
+            .border(
+                width = if (isSelected) 2.dp else 0.dp,
+                color = if (isSelected) Color(0xFFFFB61A) else Color.Transparent,
+                shape = RoundedCornerShape(10.dp)
+            )
     ) {
         Image(
             painter = painterResource(id = imageRes),
@@ -47,6 +63,31 @@ fun PaketBelajarCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
+
+        Surface(
+            shape = CircleShape,
+            color = if (isSelected) Color(0xFFFFB61A) else Color.White.copy(alpha = 0.8f),
+            border = BorderStroke(
+                width = 2.dp,
+                color = if (isSelected) Color(0xFFFFB61A) else Color(0xFFBDBDBD)
+            ),
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .clickable { onSelectionChanged(!isSelected) }
+        ) {
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Selected",
+                    tint = Color(0xFF031A2F),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
+                )
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -81,7 +122,6 @@ fun PaketBelajarCard(
             }
         }
     }
-
     Spacer(Modifier.height(24.dp))
 }
 
