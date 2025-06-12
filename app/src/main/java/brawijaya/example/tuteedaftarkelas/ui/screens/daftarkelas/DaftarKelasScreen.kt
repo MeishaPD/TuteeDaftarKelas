@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import brawijaya.example.tuteedaftarkelas.data.TutorData
+import brawijaya.example.tuteedaftarkelas.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +55,7 @@ fun DaftarKelasScreen(
     var selectedPackage by remember { mutableStateOf<String?>(null) }
     var selectedModules by remember { mutableStateOf(setOf<Int>()) }
     var selectedDay by remember { mutableStateOf<String?>(null) }
-    var selectedTutor by remember { mutableStateOf<String?>(null) }
+    var selectedTutor by remember { mutableStateOf<TutorData?>(null) }
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress / 5f,
@@ -170,7 +172,9 @@ fun DaftarKelasScreen(
                     progress = { animatedProgress },
                     color = Color(0xFFFFB61A),
                     trackColor = Color.Transparent,
-                    modifier = Modifier.fillMaxSize().padding(2.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(2.dp),
                 )
             }
 
@@ -187,6 +191,7 @@ fun DaftarKelasScreen(
                         }
                     )
                 }
+
                 2 -> {
                     PilihPaketBelajarScreen(
                         modifier = Modifier.align(Alignment.Start),
@@ -197,6 +202,7 @@ fun DaftarKelasScreen(
                         }
                     )
                 }
+
                 3 -> {
                     PilihModulBelajarScreen(
                         modifier = Modifier.align(Alignment.Start),
@@ -206,6 +212,7 @@ fun DaftarKelasScreen(
                         }
                     )
                 }
+
                 4 -> {
                     PilihTutorScreen(
                         modifier = Modifier.align(Alignment.Start),
@@ -218,6 +225,15 @@ fun DaftarKelasScreen(
                         onTutorSelectionChanged = { newSelectedTutor ->
                             selectedTutor = newSelectedTutor
                         }
+                    )
+                }
+
+                5 -> {
+                    BookingScreen(
+                        selectedTutor = selectedTutor,
+                        selectedPackage = selectedPackage,
+                        selectedProgram = selectedProgram,
+                        onBookingClick = { navController.navigate(Screen.SuccessBook.route) }
                     )
                 }
             }
