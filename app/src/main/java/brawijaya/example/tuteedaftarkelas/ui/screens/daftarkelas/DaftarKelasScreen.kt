@@ -29,7 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,18 +43,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DaftarKelasScreen(
     navController: NavController
 ) {
-    var progress by remember { mutableFloatStateOf(3/5f) }
+    var progress by remember { mutableIntStateOf(1) }
     var selectedProgram by remember { mutableStateOf<String?>(null) }
+    var selectedPackage by remember { mutableStateOf<String?>(null) }
     var selectedModules by remember { mutableStateOf(setOf<Int>()) }
+    var selectedDay by remember { mutableStateOf<String?>(null) }
+    var selectedTutor by remember { mutableStateOf<String?>(null) }
 
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
+        targetValue = progress / 5f,
         animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
         label = "progress_animation"
     )
@@ -70,9 +72,17 @@ fun DaftarKelasScreen(
                     navigationIcon = {
                         IconButton(
                             onClick = {
-                                if (progress > 1/5f) {
-                                    progress = 1/5f
-                                    selectedProgram = null
+                                if (progress > 1) {
+                                    progress -= 1
+                                    if (progress == 3) {
+                                        selectedDay = null
+                                        selectedTutor = null
+                                    }
+                                    if (progress == 2) selectedModules = emptySet()
+                                    if (progress == 1) {
+                                        selectedProgram = null
+                                        selectedPackage = null
+                                    }
                                 }
                             },
                             colors = IconButtonDefaults.iconButtonColors(
@@ -102,9 +112,24 @@ fun DaftarKelasScreen(
             }
         },
         floatingActionButton = {
-            if (progress == 3/5f && selectedModules.isNotEmpty()) {
+            val canProceed = when (progress) {
+                1 -> selectedProgram != null
+                2 -> selectedPackage != null
+                3 -> selectedModules.isNotEmpty()
+                4 -> selectedTutor != null && selectedDay != null
+                else -> false
+            }
+
+            if (canProceed) {
                 ExtendedFloatingActionButton(
-                    onClick = { progress = 4/5f },
+                    onClick = {
+                        when (progress) {
+                            1 -> progress = 2
+                            2 -> progress = 3
+                            3 -> progress = 4
+                            4 -> progress = 5
+                        }
+                    },
                     containerColor = Color(0xFF052B4F),
                     contentColor = Color.White,
                     shape = RoundedCornerShape(10.dp),
@@ -149,30 +174,52 @@ fun DaftarKelasScreen(
                 )
             }
 
-            if (progress == 1/5f) {
-                PilihProgramBelajarScreen(
-                    onProgramSelected = { programTitle ->
-                        println("DEBUG: Program selected - $programTitle")
-                        selectedProgram = programTitle
-                        progress = 2/5f
-                        println("DEBUG: Progress updated to $progress")
-                    }
-                )
-            } else if (progress == 2/5f) {
-                PilihPaketBelajarScreen(
-                    modifier = Modifier.align(Alignment.Start),
-//                    selectedProgram = selectedProgram ?: ""
-                )
-            } else if (progress == 3/5f) {
-                PilihModulBelajarScreen(
-                    modifier = Modifier.align(Alignment.Start),
-                    selectedModules = selectedModules,
-                    onModuleSelectionChanged = { newSelectedModules ->
-                        selectedModules = newSelectedModules
-                    }
-                )
-            } else if (progress == 4/5f) {
-
+            when (progress) {
+                1 -> {
+                    PilihProgramBelajarScreen(
+                        selectedProgram = selectedProgram,
+                        onSelectionChanged = { newSelectedProgram ->
+                            selectedProgram = newSelectedProgram
+                            selectedPackage = null
+                            selectedTutor = null
+                            selectedDay = null
+                            println("DEBUG: Program selected - $selectedProgram")
+                        }
+                    )
+                }
+                2 -> {
+                    PilihPaketBelajarScreen(
+                        modifier = Modifier.align(Alignment.Start),
+                        selectedPackage = selectedPackage,
+                        onPackageSelectionChanged = { newSelectedPackage ->
+                            selectedPackage = newSelectedPackage
+                            println("DEBUG: Package selected - $selectedPackage")
+                        }
+                    )
+                }
+                3 -> {
+                    PilihModulBelajarScreen(
+                        modifier = Modifier.align(Alignment.Start),
+                        selectedModules = selectedModules,
+                        onModuleSelectionChanged = { newSelectedModules ->
+                            selectedModules = newSelectedModules
+                        }
+                    )
+                }
+                4 -> {
+                    PilihTutorScreen(
+                        modifier = Modifier.align(Alignment.Start),
+                        selectedProgram = selectedProgram,
+                        selectedDay = selectedDay,
+                        selectedTutor = selectedTutor,
+                        onDaySelectionChanged = { newSelectedDay ->
+                            selectedDay = newSelectedDay
+                        },
+                        onTutorSelectionChanged = { newSelectedTutor ->
+                            selectedTutor = newSelectedTutor
+                        }
+                    )
+                }
             }
         }
     }
