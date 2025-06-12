@@ -53,7 +53,7 @@ fun TutorCard(
     tutorData: TutorData,
     isSelected: Boolean,
     selectedDay: String?,
-    onTutorSelected: (String) -> Unit,
+    onTutorSelected: (TutorData) -> Unit,
     onDaySelectionChanged: (String?) -> Unit
 ) {
 
@@ -86,7 +86,7 @@ fun TutorCard(
                 color = if (isSelected) Color(0xFFFFB61A) else Color.Transparent,
                 shape = RoundedCornerShape(10.dp)
             )
-            .clickable { onTutorSelected(tutorData.id) }
+            .clickable { onTutorSelected(tutorData) }
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -117,7 +117,7 @@ fun TutorCard(
                         text = tutorData.role,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Medium,
-                            fontSize = 8.sp
+                            fontSize = 10.sp
                         )
                     )
                 }

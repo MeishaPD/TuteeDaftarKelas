@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import brawijaya.example.tuteedaftarkelas.data.TutorData
 import brawijaya.example.tuteedaftarkelas.data.TutorRepository
 import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.TutorCard
 
@@ -21,9 +22,9 @@ fun PilihTutorScreen(
     modifier: Modifier,
     selectedProgram: String?,
     selectedDay: String?,
-    selectedTutor: String?,
+    selectedTutor: TutorData?,
     onDaySelectionChanged: (String?) -> Unit,
-    onTutorSelectionChanged: (String?) -> Unit
+    onTutorSelectionChanged: (TutorData?) -> Unit
 ) {
     val availableTutors = remember(selectedProgram) {
         if (selectedProgram != null) {
@@ -57,19 +58,19 @@ fun PilihTutorScreen(
             availableTutors.forEachIndexed { index, tutor ->
                 TutorCard(
                     tutorData = tutor,
-                    isSelected = selectedTutor == tutor.id,
-                    selectedDay = if (selectedTutor == tutor.id) selectedDay else null,
-                    onTutorSelected = { tutorId ->
-                        if (selectedTutor == tutorId) {
+                    isSelected = selectedTutor == tutor,
+                    selectedDay = if (selectedTutor == tutor) selectedDay else null,
+                    onTutorSelected = { newSelectedTutor ->
+                        if (selectedTutor == newSelectedTutor) {
                             onTutorSelectionChanged(null)
                             onDaySelectionChanged(null)
                         } else {
-                            onTutorSelectionChanged(tutorId)
+                            onTutorSelectionChanged(newSelectedTutor)
                             onDaySelectionChanged(null)
                         }
                     },
                     onDaySelectionChanged = { day ->
-                        if (selectedTutor == tutor.id) {
+                        if (selectedTutor == tutor) {
                             onDaySelectionChanged(day)
                         }
                     }
