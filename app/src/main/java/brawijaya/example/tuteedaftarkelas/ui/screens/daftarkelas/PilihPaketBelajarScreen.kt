@@ -16,6 +16,7 @@ import brawijaya.example.tuteedaftarkelas.ui.screens.daftarkelas.components.buil
 
 @Composable
 fun PilihPaketBelajarScreen(modifier: Modifier) {
+
     val imageList = listOf(
         R.drawable.bg_paket_card_1,
         R.drawable.bg_paket_card_2,
