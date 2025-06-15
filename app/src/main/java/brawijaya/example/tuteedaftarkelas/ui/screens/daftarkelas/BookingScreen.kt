@@ -358,7 +358,7 @@ fun BookingScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { onBookingClick },
+            onClick = { onBookingClick() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
