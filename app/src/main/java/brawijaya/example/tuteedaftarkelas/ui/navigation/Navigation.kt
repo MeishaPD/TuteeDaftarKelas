@@ -16,7 +16,7 @@ sealed class Screen (val route: String) {
 fun AppNavigation (navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.SuccessBook.route
+        startDestination = Screen.DaftarKelas.route
     ) {
         composable(Screen.DaftarKelas.route) {
             DaftarKelasScreen(navController = navController)
